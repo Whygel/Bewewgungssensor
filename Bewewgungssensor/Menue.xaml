@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Bewewgungssensor.Menue"
              Title="Menue">
+    
     <VerticalStackLayout>
         <Label 
       Text="Point Rush" FontSize="Caption"
@@ -11,11 +12,10 @@
 
         <StackLayout Orientation="Horizontal"    VerticalOptions="Center" 
 HorizontalOptions="Center">
-            <Label Text="Name" FontSize="Header"/>
-            <Entry x:Name="TbPlayerName"/>
+            <Label Text="Name" FontSize="Header" VerticalOptions="Center" />
+            <Entry x:Name="TbPlayerName" VerticalOptions="Center" />
         </StackLayout>
 
-        <Button Text="Spiel starten"       VerticalOptions="Center" 
-HorizontalOptions="Center"/>
+        <Button Text="Spiel starten"       VerticalOptions="Center"  Clicked="Button_Clicked"/>
     </VerticalStackLayout>
 </ContentPage>

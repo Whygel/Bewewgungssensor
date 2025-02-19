@@ -6,9 +6,8 @@ namespace Bewewgungssensor
         public App()
         {
             InitializeComponent();
-
-
-            MainPage  = new  Menue();        }
+            MainPage = new NavigationPage(new Menue());
+        }
 
     }
 

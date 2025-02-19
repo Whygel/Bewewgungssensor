@@ -12,4 +12,6 @@
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
+    <ShellContent Title="Spielfeld" Route="Spielfeld" ContentTemplate="{DataTemplate local:Spielfeld}" />
+
 </Shell>
