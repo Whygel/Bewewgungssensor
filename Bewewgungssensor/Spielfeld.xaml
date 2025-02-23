@@ -22,7 +22,7 @@
             </HorizontalStackLayout>
 
                 <Label Grid.Column="1" x:Name="LbTimer" Text="Zeit" HorizontalOptions="Center" />
-                <Button Text="Exit" Background="Red" TextColor="White" HorizontalOptions="End"  Grid.Column="2"/>
+                <Button Text="Exit" Background="Red" TextColor="White" HorizontalOptions="End" Clicked="Button_Clicked" Grid.Column="2"/>
             </Grid>
 
             <Border Grid.Row="1" StrokeThickness="2" Stroke="Black" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
