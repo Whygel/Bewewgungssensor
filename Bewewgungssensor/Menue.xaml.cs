@@ -1,8 +1,11 @@
+using Bewewgungssensor.Datenbank;
+
 namespace Bewewgungssensor;
 
 public partial class Menue : ContentPage
 {
-	public Menue()
+    private readonly DatenbankService _database = new();
+    public Menue()
 	{
 		InitializeComponent();
 	}
@@ -11,5 +14,16 @@ public partial class Menue : ContentPage
     {
         await Navigation.PushAsync(new Spielfeld(TbPlayerName.Text));
         //await Shell.Current.GoToAsync("//Spielfeld");
+    }
+
+    private async void ContentPage_Loaded(object sender, EventArgs e)
+    {
+        string spielername = "Max";  // Beispiel: Den Namen aus Eingabefeld holen
+        int score = new Random().Next(1000);  // Beispielwert
+
+        await _database.AddHighscoreAsync(spielername, score);
+
+        var highscores = await _database.GetHighscoresAsync();
+        HighscoreListView.ItemsSource = highscores;
     }
 }

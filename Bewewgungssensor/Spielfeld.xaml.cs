@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using Microsoft.Maui.Devices.Sensors;
 using System.Text.RegularExpressions;
 using Microsoft.Maui.Layouts;
-using GameplayKit;
 
 public partial class Spielfeld : ContentPage
 {
@@ -75,8 +74,9 @@ public partial class Spielfeld : ContentPage
         {
             while (!GameOver)
             {
+                Task.Delay(10).Wait();
                 GameHasStart = true;
-                await Task.Delay(500); // Verhindert das Blockieren des Threads
+                // Verhindert das Blockieren des Threads
                 CalculateMovement();
             }
         });
@@ -142,33 +142,71 @@ public partial class Spielfeld : ContentPage
         {
             newPosX = Spieler.X - Speed;
         }
+
+
+
+        if ( (newPosX + Spieler.Width > SpielfeldLayout.Width || newPosX < 0 )&& (newPosY + Spieler.Height > SpielfeldLayout.Height || newPosY < 0))
+            return;
+
+        if (newPosX + Spieler.Width > SpielfeldLayout.Width || newPosX < 0)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(Spieler.X, newPosY, Spieler.Width, Spieler.Height));
+            });
+            return;
+        }
+
+
+        if (newPosY + Spieler.Height > SpielfeldLayout.Height || newPosY < 0)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(newPosX, Spieler.Y, Spieler.Width, Spieler.Height));
+            });
+            return;
+        }
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(newPosX ,newPosY, Spieler.Width, Spieler.Height));
+            SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(newPosX, newPosY, Spieler.Width, Spieler.Height));
         });
 
 
-       foreach(var obstacle in ListOfObstacle)
+
+
+
+
+        if (ListOfObstacle != null)
         {
-            if (CheckCollision(obstacle))
+
+            foreach (var obstacle in ListOfObstacle)
             {
-                Score += 100;
-                TbScore.Text = $"Score: {score}";
-                return;
+                if (CheckCollision(obstacle))
+                {
+                    Score += 100;
+                    TbScore.Text = $"0{Score}";
+                    return;
+                }
             }
         }
-
         // Kolliosinhandlung 
-
-
     }
 
     private bool CheckCollision(Border obstacle)
     {
         var playerBounds = AbsoluteLayout.GetLayoutBounds(Spieler);
         var obstacleBounds = AbsoluteLayout.GetLayoutBounds(obstacle);
+        bool IsCollaide = false;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var rect1 = new Rect(playerBounds.X, playerBounds.Y, playerBounds.Width, playerBounds.Height);
+            var rect2 = new Rect(obstacleBounds.X, obstacleBounds.Y, obstacleBounds.Width, obstacleBounds.Height);
+            IsCollaide =  rect2.IntersectsWith(rect1);
+        });
+        return IsCollaide;
 
-        return (Math.Abs(playerBounds.X - obstacleBounds.X) < 0.1) && (Math.Abs(playerBounds.Y - obstacleBounds.Y) < 0.1);
+
+
     }
 
     public void ToggleAccelerometer()
@@ -217,20 +255,17 @@ public partial class Spielfeld : ContentPage
     {
         if(!SavedInitialPosition)
         {
-            InitialNeigungX = e.Reading.Acceleration.X;
-            InitialNeigungY = e.Reading.Acceleration.Y; 
+            //InitialNeigungX = e.Reading.Acceleration.X;
+            //InitialNeigungY = e.Reading.Acceleration.Y; 
             SavedInitialPosition = true;
 
            
             return;
         }
        // Koordinaten = e.Reading.ToString();
-        NeigungX = e.Reading.Acceleration.X;
-        NeigungY = e.Reading.Acceleration.Y;
+        //NeigungX = e.Reading.Acceleration.X;
+        //NeigungY = e.Reading.Acceleration.Y;
         AccelerationZ = e.Reading.Acceleration.Z;
-
-      
-
     }
     private void ContentPage_Loaded(object sender, EventArgs e)
     {
