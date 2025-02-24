@@ -29,9 +29,9 @@ namespace Bewewgungssensor.Datenbank
             return await _database.Table<HighScore>().OrderByDescending(h => h.Score).ToListAsync();
         }
 
-        public async Task AddHighscoreAsync(string spielername, int score)
+        public async Task AddHighscoreAsync(string iSpielername, int iScore)
         {
-            await _database.InsertAsync(new HighScore { Spielername = spielername, Score = score });
+            await _database.InsertAsync(new HighScore { Spielername = iSpielername, Score = iScore });
 
             // Stelle sicher, dass nur die 10 höchsten Scores bleiben
             var highscores = await GetHighscoresAsync();

@@ -8,29 +8,33 @@ public partial class Menue : ContentPage
     int Score;
     bool GameFinished = false;
     string Spielername = string.Empty;
-    public Menue(int iScore, bool iGameFinished)
+    public Menue(int iScore, bool iGameFinished, string iSpielername)
 	{
 		InitializeComponent();
         Score = iScore;
         GameFinished = iGameFinished;
+        Spielername = iSpielername;
 	}
 
     private  async void Button_Clicked(object sender, EventArgs e)
     {
-        Spielername = TbPlayerName.Text;
+        Spielername = TbPlayerName.Text?.Trim();
         await Navigation.PushAsync(new Spielfeld(TbPlayerName.Text));
     }
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {
+
         if (GameFinished)
         {
             TbPlayerName.Text = Spielername;
-            await _database.AddHighscoreAsync(Spielername, Score);        
+            
+            if(Spielername != null)
+                await _database.AddHighscoreAsync(Spielername, Score);        
         }
         var highscores = await _database.GetHighscoresAsync();
-        HighscoreListView.ItemsSource = highscores;
-        HighscoreListView.ItemsSource = highscores;
+        HighscoreCollectionView.ItemsSource = highscores;
+        HighscoreCollectionView.ItemsSource = highscores;
 
     }
 }

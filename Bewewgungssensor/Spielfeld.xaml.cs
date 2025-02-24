@@ -9,16 +9,17 @@ public partial class Spielfeld : ContentPage
 {
 	IDispatcherTimer _timer;
     int ClockNumber = 0;
-	int CountDown = 3;
+	int CountDown = 4;
 	bool GameHasStart = false;
 	bool GameOver = false;
-
+    string Spielername;
 	private const double Speed = 10;
     int Score  = 0;
-    public Spielfeld(string Spielername)
+    public Spielfeld(string iSpielername)
 	{
 		InitializeComponent();
 		_timer = Dispatcher.CreateTimer();
+        Spielername = iSpielername;
     }
 	private void _timer_Tick(object? sender, EventArgs e)
 	{
@@ -44,11 +45,14 @@ public partial class Spielfeld : ContentPage
 
 
         if (ClockNumber == 60)
-			GameOver = true;
+        {
+            _timer.Stop();
+            GameOver = true;
+            _timer.Tick -= _timer_Tick;
+        }
+			
 	}
-
     List<Border> ListOfObstacle = new List<Border>();
-
     bool SavedInitialPosition = false;
 
     double SpielfeldWidth;
@@ -78,7 +82,7 @@ public partial class Spielfeld : ContentPage
         {
             while (!GameOver)
             {
-                Task.Delay(500).Wait();
+                Task.Delay(10).Wait();
                 GameHasStart = true;
                 CalculateMovement();
                 HandleCollision();
@@ -87,7 +91,7 @@ public partial class Spielfeld : ContentPage
         });
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await Navigation.PushAsync(new Menue(Score, true));
+            await Navigation.PushAsync(new Menue(Score, true, Spielername));
         });
     }
 
@@ -116,10 +120,10 @@ public partial class Spielfeld : ContentPage
     double newPosY;
     private void CalculateMovement()
     {
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            LbSpielerPosition.Text = $"X:{Spieler.X} Y:{Spieler.Y}";
-        });
+        //MainThread.BeginInvokeOnMainThread(() =>
+        //{
+        //    LbSpielerPosition.Text = $"X:{Spieler.X} Y:{Spieler.Y}";
+        //});
 
         if (AccelerationZ < 0)
         {
@@ -175,7 +179,7 @@ public partial class Spielfeld : ContentPage
             {
                 if (CheckCollision(obstacle))
                 {
-                    Score += 1000;
+                    Score += 100;
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         if (Score >= 1000)
@@ -290,22 +294,21 @@ public partial class Spielfeld : ContentPage
     }
     private void ContentPage_Disappearing(object sender, EventArgs e)
     {
-        Accelerometer.Default.Stop();
-        Accelerometer.Default.ReadingChanged -= Default_ReadingChanged;
-
-        Magnetometer.Default.Stop();
-        Magnetometer.Default.ReadingChanged -= MagnetometerChanged;
-        GameOver = true;
+        HanddleCloseing();
     }
 
     private void Button_Clicked(object sender, EventArgs e)
+    {
+        HanddleCloseing();
+    }
+
+    void HanddleCloseing()
     {
         Accelerometer.Default.Stop();
         Accelerometer.Default.ReadingChanged -= Default_ReadingChanged;
 
         Magnetometer.Default.Stop();
         Magnetometer.Default.ReadingChanged -= MagnetometerChanged;
-
-        GameOver = true;
+       
     }
 }

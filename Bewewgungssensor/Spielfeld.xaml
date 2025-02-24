@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Bewewgungssensor.Spielfeld"
-             Title="Spielfeld" Loaded="ContentPage_Loaded" Disappearing="ContentPage_Disappearing">
+              Loaded="ContentPage_Loaded" Disappearing="ContentPage_Disappearing">
     <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -16,27 +16,22 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
 
-            <VerticalStackLayout  Grid.Column="0">
-                <HorizontalStackLayout  HorizontalOptions="Start">
-                    <Label Text="Highscore: " Margin="0,0,5,0"/>
-                    <Label x:Name="TbScore" Text="0000"/>
+            <VerticalStackLayout  Grid.Column="0" >
+                <HorizontalStackLayout  HorizontalOptions="Start" VerticalOptions="Center">
+                    <Label Text="Score: " Margin="0,0,5,0" HorizontalOptions="Center" FontSize="18"/>
+                    <Label x:Name="TbScore" Text="0000" HorizontalOptions="Center" FontSize="18"/>
                 </HorizontalStackLayout>
                 
-                <HorizontalStackLayout  HorizontalOptions="Start">
-                    <Label Text="Width and Height: " Margin="0,0,5,0"/>
-                    <Label x:Name="LbSoielfeld" Text="0000"/>
-                </HorizontalStackLayout>
 
 
             </VerticalStackLayout>
 
 
             <VerticalStackLayout Grid.Column="1">
-                <Label  x:Name="LbTimer" Text="Zeit" HorizontalOptions="Center" />
-                <Label x:Name="LbSpielerPosition"  HorizontalOptions="Center"/>
+                <Label  x:Name="LbTimer" Text="Zeit" HorizontalOptions="Center" TextColor="Red" FontSize="18"/>
+                <!--<Label x:Name="LbSpielerPosition"  HorizontalOptions="Center"/>-->
             </VerticalStackLayout>
-         
-                <Button Text="Exit" Background="Red" TextColor="White" HorizontalOptions="End" Clicked="Button_Clicked" Grid.Column="2"/>
+            <Button Text="Exit" Background="Red" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Clicked="Button_Clicked" Grid.Column="2"/>
             </Grid>
 
             <Border Grid.Row="1" StrokeThickness="2" Stroke="Black" x:Name="SpielfeldRand" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
