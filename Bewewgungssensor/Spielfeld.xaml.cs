@@ -19,7 +19,6 @@ public partial class Spielfeld : ContentPage
 	{
 		InitializeComponent();
 		_timer = Dispatcher.CreateTimer();
-        
     }
 	private void _timer_Tick(object? sender, EventArgs e)
 	{
@@ -34,7 +33,6 @@ public partial class Spielfeld : ContentPage
             {
                 GameLoop();
             }
-
         }
 
         if (GameHasStart)
@@ -49,22 +47,28 @@ public partial class Spielfeld : ContentPage
 			GameOver = true;
 	}
 
-    double SpielerX;
-    double SpielerY;
     List<Border> ListOfObstacle = new List<Border>();
 
     bool SavedInitialPosition = false;
 
+    double SpielfeldWidth;
+    double SpielfeldHeight;
+
     private async void GameLoop()
     {
+        SpielfeldWidth = SpielfeldLayout.Width;
+        SpielfeldHeight = SpielfeldLayout.Height;
 
-        double SpielerX = SpielfeldLayout.Width;
-        double SpielerY = SpielfeldLayout.Height;
-    
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+           // LbSoielfeld.Text = SpielfeldLayout.Height.ToString() + "|" + SpielfeldLayout.Width.ToString();
+            SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(SpielfeldWidth / 2, SpielfeldLayout.Height/2, Spieler.Width, Spieler.Height));
+        });
+
         int CountObstacle = 3;
         ToggleAccelerometer();
 
-        for (int i = 0; i <= CountObstacle; i++)
+        for (int i = 0; i< CountObstacle; i++)
         {
             {
                 CreateObstacle();
@@ -74,15 +78,16 @@ public partial class Spielfeld : ContentPage
         {
             while (!GameOver)
             {
-                Task.Delay(10).Wait();
+                Task.Delay(500).Wait();
                 GameHasStart = true;
-                // Verhindert das Blockieren des Threads
                 CalculateMovement();
+                HandleCollision();
             }
+           
         });
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await Navigation.PushAsync(new Menue());
+            await Navigation.PushAsync(new Menue(Score, true));
         });
     }
 
@@ -99,33 +104,24 @@ public partial class Spielfeld : ContentPage
         {
             BackgroundColor = Colors.Red,
             WidthRequest = 50,
-            HeightRequest = 50
+            HeightRequest = 50,
         };
         ListOfObstacle.Add(newObstacle);
 
-        foreach (Border obstacle in ListOfObstacle)
-        {
-            if (obstacle.Parent != null)
-            {
-                ((AbsoluteLayout)obstacle.Parent).Children.Remove(obstacle);
-            }
-            x = RandomX.Next(0, (int)SpielfeldLayout.Height);
-            y = RandomY.Next(0, (int)SpielfeldLayout.Width);
-
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                AbsoluteLayout.SetLayoutBounds(obstacle, new Rect(x, y, obstacle.Width, obstacle.Height));
-                AbsoluteLayout.SetLayoutFlags(obstacle, AbsoluteLayoutFlags.None);
-                SpielfeldLayout.Add(obstacle);
-            });           
-        }
+        obstacleNewPosition(newObstacle);         
+       
     }
 
     double newPosX;
     double newPosY;
     private void CalculateMovement()
     {
-        if(AccelerationZ < 0)
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            LbSpielerPosition.Text = $"X:{Spieler.X} Y:{Spieler.Y}";
+        });
+
+        if (AccelerationZ < 0)
         {
             newPosY = Spieler.Y - Speed;
         }
@@ -142,13 +138,10 @@ public partial class Spielfeld : ContentPage
         {
             newPosX = Spieler.X - Speed;
         }
-
-
-
-        if ( (newPosX + Spieler.Width > SpielfeldLayout.Width || newPosX < 0 )&& (newPosY + Spieler.Height > SpielfeldLayout.Height || newPosY < 0))
+        if ((newPosX + Spieler.Width > SpielfeldWidth || newPosX < 0) && (newPosY + Spieler.Height > SpielfeldHeight || newPosY < 0))
             return;
 
-        if (newPosX + Spieler.Width > SpielfeldLayout.Width || newPosX < 0)
+        if (newPosX + Spieler.Width > SpielfeldWidth || newPosX < 0)
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -157,8 +150,7 @@ public partial class Spielfeld : ContentPage
             return;
         }
 
-
-        if (newPosY + Spieler.Height > SpielfeldLayout.Height || newPosY < 0)
+        if ((int)newPosY + Spieler.Height > (int)SpielfeldHeight || newPosY < 0)
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -173,9 +165,9 @@ public partial class Spielfeld : ContentPage
 
 
 
-
-
-
+    }
+    void HandleCollision()
+    {
         if (ListOfObstacle != null)
         {
 
@@ -183,30 +175,53 @@ public partial class Spielfeld : ContentPage
             {
                 if (CheckCollision(obstacle))
                 {
-                    Score += 100;
-                    TbScore.Text = $"0{Score}";
-                    return;
+                    Score += 1000;
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (Score >= 1000)
+                            TbScore.Text = $"{Score}";
+                        else
+                            TbScore.Text = $"0{Score}";
+                        SpielfeldLayout.Remove(obstacle);
+                        obstacleNewPosition(obstacle);
+                    });                                   
                 }
             }
         }
-        // Kolliosinhandlung 
+    }
+
+    private void obstacleNewPosition(Border iBorder)
+    {
+        if (iBorder.Parent != null)
+        {
+            ((AbsoluteLayout)iBorder.Parent).Children.Remove(iBorder);
+        }
+        x = RandomX.Next(0, (int)SpielfeldWidth - (int)iBorder.Width - 10);
+        y = RandomY.Next(0, (int)SpielfeldHeight - (int)iBorder.Height - 10);
+
+
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            AbsoluteLayout.SetLayoutBounds(iBorder, new Rect(x, y, iBorder.Width, iBorder.Height));
+            AbsoluteLayout.SetLayoutFlags(iBorder, AbsoluteLayoutFlags.None);
+            SpielfeldLayout.Add(iBorder);
+        });
     }
 
     private bool CheckCollision(Border obstacle)
     {
         var playerBounds = AbsoluteLayout.GetLayoutBounds(Spieler);
         var obstacleBounds = AbsoluteLayout.GetLayoutBounds(obstacle);
-        bool IsCollaide = false;
-        MainThread.BeginInvokeOnMainThread(() =>
+        if(Spieler.X >= obstacle.X & Spieler.X + Spieler.Width <= obstacle.X+ obstacle.Width& 
+            Spieler.Y >= obstacle.Y & Spieler.Y + Spieler.Height <= obstacle.Y + obstacle.Height)
         {
-            var rect1 = new Rect(playerBounds.X, playerBounds.Y, playerBounds.Width, playerBounds.Height);
-            var rect2 = new Rect(obstacleBounds.X, obstacleBounds.Y, obstacleBounds.Width, obstacleBounds.Height);
-            IsCollaide =  rect2.IntersectsWith(rect1);
-        });
-        return IsCollaide;
-
-
-
+            return  true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public void ToggleAccelerometer()
@@ -231,13 +246,13 @@ public partial class Spielfeld : ContentPage
         {
             if (!Magnetometer.Default.IsMonitoring)
             {
-                // Turn on accelerometer
+                // Turn on Magnetometer
                 Magnetometer.Default.ReadingChanged += MagnetometerChanged;
                 Magnetometer.Default.Start(SensorSpeed.Game);
             }
             else
             {
-                // Turn off accelerometer
+                // Turn off Magnetometer
                 Magnetometer.Default.Stop();
                 Magnetometer.Default.ReadingChanged -= MagnetometerChanged;
             }
@@ -258,8 +273,6 @@ public partial class Spielfeld : ContentPage
             //InitialNeigungX = e.Reading.Acceleration.X;
             //InitialNeigungY = e.Reading.Acceleration.Y; 
             SavedInitialPosition = true;
-
-           
             return;
         }
        // Koordinaten = e.Reading.ToString();
@@ -272,21 +285,27 @@ public partial class Spielfeld : ContentPage
         _timer.Interval = TimeSpan.FromSeconds(1);
         _timer.Tick += _timer_Tick;
         _timer.Start();
-        SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(0.5, 0.5, Width, Height));
+        // SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(0.5, 0.5, Width, Height));
         SavedInitialPosition = false;
-
     }
     private void ContentPage_Disappearing(object sender, EventArgs e)
     {
         Accelerometer.Default.Stop();
         Accelerometer.Default.ReadingChanged -= Default_ReadingChanged;
+
+        Magnetometer.Default.Stop();
+        Magnetometer.Default.ReadingChanged -= MagnetometerChanged;
+        GameOver = true;
     }
 
     private void Button_Clicked(object sender, EventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Navigation.PushAsync(new Menue());
-        });
+        Accelerometer.Default.Stop();
+        Accelerometer.Default.ReadingChanged -= Default_ReadingChanged;
+
+        Magnetometer.Default.Stop();
+        Magnetometer.Default.ReadingChanged -= MagnetometerChanged;
+
+        GameOver = true;
     }
 }

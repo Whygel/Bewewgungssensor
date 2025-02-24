@@ -17,12 +17,23 @@ HorizontalOptions="Center">
         </StackLayout>
 
         <Button Text="Spiel starten"       VerticalOptions="Center"  Clicked="Button_Clicked"/>
-        <ListView x:Name="HighscoreListView">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextCell Text="{Binding Spielername}" Detail="{Binding Score}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ListView x:Name="HighscoreListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Spielername}" Detail="{Binding Score}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
     </VerticalStackLayout>
 </ContentPage>
