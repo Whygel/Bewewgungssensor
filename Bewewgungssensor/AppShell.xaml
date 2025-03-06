@@ -7,10 +7,10 @@
     Shell.FlyoutBehavior="Disabled"
     Title="Bewewgungssensor">
 
-    <ShellContent
+    <!--<ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="MainPage" />-->
 
     <ShellContent Title="Spielfeld" Route="Spielfeld" ContentTemplate="{DataTemplate local:Spielfeld}" />
 

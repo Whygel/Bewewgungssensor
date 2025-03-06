@@ -120,10 +120,6 @@ public partial class Spielfeld : ContentPage
     double newPosY;
     private void CalculateMovement()
     {
-        //MainThread.BeginInvokeOnMainThread(() =>
-        //{
-        //    LbSpielerPosition.Text = $"X:{Spieler.X} Y:{Spieler.Y}";
-        //});
 
         if (AccelerationZ < 0)
         {
@@ -166,9 +162,6 @@ public partial class Spielfeld : ContentPage
         {
             SpielfeldLayout.SetLayoutBounds(Spieler, new Rect(newPosX, newPosY, Spieler.Width, Spieler.Height));
         });
-
-
-
     }
     void HandleCollision()
     {
